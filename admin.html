@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Monitoring | 7 KAIH VERTIKAL SMA 2026</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <!-- Header Bar -->
+  <header class="app-header">
+    <div class="header-container header-container-wide">
+      <div class="brand-wrapper">
+        <div class="brand-badge" style="background: var(--gray-800);">ADM</div>
+        <div class="brand-text">
+          <h1>Panel Admin & Pengawas</h1>
+          <span>Monitoring 7 KAIH &bull; VERTIKAL SMA 2026</span>
+        </div>
+      </div>
+      <div class="header-user">
+        <div class="user-pill" id="headerUserPill" style="display: none;">
+          <span id="headerUserName">Admin</span>
+        </div>
+        <a id="sheetLinkBtn" href="https://docs.google.com/spreadsheets/d/1mOZ5wnaW4SCVRDdfgJd8rSFqs11fyndA-y9AuWoXpQ0/edit" target="_blank" rel="noopener" class="btn btn-outline btn-sm">
+          Buka Google Sheets
+        </a>
+        <button id="logoutBtn" class="btn btn-outline btn-sm">Keluar</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container container-wide">
+    <!-- Top Action & Sesi Selector Bar -->
+    <div class="card" style="margin-bottom: 1.25rem; padding: 1.15rem 1.25rem;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+        <div>
+          <span class="badge badge-primary" style="margin-bottom: 0.25rem;">Pemantauan Berkala</span>
+          <h2 style="font-size: 1.3rem; font-weight: 700; color: var(--gray-900);">
+            Rekapitulasi Partisipasi Siswa
+          </h2>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+          <label for="sesiSelect" style="font-size: 0.85rem; font-weight: 600; color: var(--gray-700);">
+            Pilih Sesi:
+          </label>
+          <select id="sesiSelect" class="form-control" style="width: auto; min-width: 120px; font-weight: 600;">
+            <option value="1">Sesi 1</option>
+            <option value="2">Sesi 2</option>
+            <option value="3">Sesi 3</option>
+            <option value="4">Sesi 4</option>
+          </select>
+          <button id="setActiveSessionBtn" class="btn btn-outline btn-sm">
+            Buka Sesi Ini
+          </button>
+          <button id="refreshBtn" class="btn btn-secondary btn-sm" title="Muat ulang data">
+            Refresh
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Statistics Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total Peserta Terdaftar</span>
+        <span class="stat-value" id="statTotalPeserta">-</span>
+        <span class="stat-sub">Siswa kelas X, XI, XII</span>
+      </div>
+      <div class="stat-card" style="border-left: 3px solid var(--success);">
+        <span class="stat-label">Sudah Mengisi</span>
+        <span class="stat-value" id="statSudahIsi" style="color: var(--success);">-</span>
+        <span class="stat-sub" id="statSudahSub">Tercatat di sistem</span>
+      </div>
+      <div class="stat-card" style="border-left: 3px solid var(--danger);">
+        <span class="stat-label">Belum Mengisi</span>
+        <span class="stat-value" id="statBelumIsi" style="color: var(--danger);">-</span>
+        <span class="stat-sub">Perlu tindak lanjut panitia</span>
+      </div>
+      <div class="stat-card" style="border-left: 3px solid var(--primary);">
+        <span class="stat-label">Tingkat Partisipasi</span>
+        <span class="stat-value" id="statPersentase" style="color: var(--primary);">- %</span>
+        <span class="stat-sub">Rasio kehadiran sesi</span>
+      </div>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="filter-bar">
+      <div class="filter-group" style="flex: 2; min-width: 200px;">
+        <label class="form-label" for="searchInput">Cari Siswa</label>
+        <input type="text" id="searchInput" class="form-control" placeholder="Ketik nama atau UID / NISN...">
+      </div>
+
+      <div class="filter-group">
+        <label class="form-label" for="filterTingkat">Tingkat</label>
+        <select id="filterTingkat" class="form-control">
+          <option value="ALL">Semua Tingkat</option>
+          <option value="10">Tingkat 10 (Kelas X)</option>
+          <option value="11">Tingkat 11 (Kelas XI)</option>
+          <option value="12">Tingkat 12 (Kelas XII)</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="form-label" for="filterKelas">Kelas</label>
+        <select id="filterKelas" class="form-control">
+          <option value="ALL">Semua Rombel</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="form-label" for="filterStatus">Status</label>
+        <select id="filterStatus" class="form-control">
+          <option value="ALL">Semua Status</option>
+          <option value="SUDAH">Sudah Mengisi</option>
+          <option value="BELUM">Belum Mengisi</option>
+        </select>
+      </div>
+
+      <div style="margin-left: auto;">
+        <button id="exportCsvBtn" class="btn btn-outline btn-sm" style="height: 40px;">
+          Download CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">No</th>
+              <th>UID / NISN</th>
+              <th>Nama Siswa</th>
+              <th>Kelas</th>
+              <th>Tingkat</th>
+              <th>Status</th>
+              <th>Waktu Kirim</th>
+              <th style="text-align: center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="pesertaTableBody">
+            <tr>
+              <td colspan="8" style="text-align: center; padding: 2.5rem;">
+                <div class="spinner spinner-primary" style="margin-bottom: 0.5rem;"></div>
+                <p style="color: var(--gray-500); font-size: 0.85rem;">Memuat data peserta...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Detail Jawaban Siswa -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="modalStudentName">Detail Jawaban Siswa</h3>
+          <span style="font-size: 0.8rem; color: var(--gray-500);" id="modalStudentMeta">NISN &bull; Kelas</span>
+        </div>
+        <button class="modal-close" id="modalCloseBtn">&times;</button>
+      </div>
+
+      <div id="modalLoading" style="text-align: center; padding: 2rem;">
+        <div class="spinner spinner-primary"></div>
+        <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--gray-500);">Mengambil rincian jawaban...</p>
+      </div>
+
+      <div id="modalContent" style="display: none;">
+        <div class="recap-list" id="modalRecapList">
+          <!-- Rincian 7 kebiasaan diisi oleh JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    Web Form Monitoring 7 KAIH &bull; VERTIKAL SMA 2026 &bull; Kemendikdasmen RI
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

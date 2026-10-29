@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulasi & Pengujian Otomatis Database 7 KAIH</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .tester-container {
+      max-width: 960px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .status-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      border-radius: var(--radius-lg);
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      box-shadow: var(--shadow-sm);
+    }
+    .switch-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 28px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: var(--gray-300);
+      transition: .3s;
+      border-radius: 34px;
+    }
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    input:checked + .toggle-slider {
+      background-color: var(--success);
+    }
+    input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+    .status-text {
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+    }
+    .status-active-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    .stat-box {
+      background: var(--white);
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--gray-200);
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      line-height: 1.2;
+    }
+    .stat-label {
+      font-size: 0.775rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-500);
+      margin-top: 0.25rem;
+    }
+    .console-log {
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      height: 320px;
+      overflow-y: auto;
+      border: 1px solid #1e293b;
+    }
+    .log-line {
+      margin-bottom: 0.25rem;
+      word-break: break-all;
+    }
+    .log-ok { color: #34d399; }
+    .log-skip { color: #fbbf24; }
+    .log-fail { color: #f87171; }
+    .log-info { color: #60a5fa; }
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background: var(--gray-200);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-top: 0.75rem;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width 0.2s ease;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-badge">PENGUJIAN & SIMULASI</div>
+        <div class="brand-text">
+          <h1>Tester Otomatis Database 7 KAIH</h1>
+          <p>VERTIKAL SMA 2026 &bull; Pengujian Pengisian Acak 357 Siswa</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <a href="admin.html" class="btn btn-outline" style="padding: 0.4rem 0.85rem; font-size: 0.85rem;">Panel Admin</a>
+        <a href="dashboard.html" class="btn btn-outline" style="padding: 0.4rem 0.85rem; font-size: 0.85rem;">Dashboard Siswa</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="tester-container">
+    <!-- Status Switch Card -->
+    <div class="status-banner">
+      <div>
+        <div style="font-size: 0.775rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Saklar Keamanan Database</div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.35rem;">
+          <span class="status-text" id="statusLabel">STATUS: AKTIF</span>
+          <span class="status-active-badge" id="statusBadge" style="background: var(--success-light); color: var(--success-dark);">Siap Mengirim</span>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--gray-500); margin-top: 0.25rem;">
+          Gunakan saklar di samping untuk mengaktifkan atau mematikan fitur pengisian otomatis kapan saja.
+        </p>
+      </div>
+      <div class="switch-wrap">
+        <label class="toggle-switch">
+          <input type="checkbox" id="mainToggle" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Configuration & Control Card -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+      <h3 style="font-size: 1.05rem; font-weight: 600; margin-bottom: 1rem; color: var(--gray-900);">Pengaturan Simulasi Pengujian</h3>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+        <div class="form-group">
+          <label class="form-label" for="sesiSelect">Target Sesi Pengisian</label>
+          <select id="sesiSelect" class="form-control">
+            <option value="1" selected>Sesi 1 (Minggu ke-1)</option>
+            <option value="2">Sesi 2 (Minggu ke-1)</option>
+            <option value="3">Sesi 3 (Minggu ke-2)</option>
+            <option value="4">Sesi 4 (Minggu ke-2)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="countSelect">Jumlah Akun yang Diuji</label>
+          <select id="countSelect" class="form-control">
+            <option value="10" selected>10 Siswa (Uji Coba Cepat)</option>
+            <option value="30">30 Siswa (1 Kelas)</option>
+            <option value="100">100 Siswa</option>
+            <option value="357">Seluruh 357 Siswa</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="delayRange">Jeda Antar Pengiriman: <span id="delayLabel" style="font-weight: 700; color: var(--primary);">350 ms</span></label>
+          <input type="range" id="delayRange" min="200" max="1500" step="50" value="350" style="width: 100%; margin-top: 0.5rem;">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <button id="startBtn" class="btn btn-primary" style="padding: 0.65rem 1.5rem;">
+          Mulai Pengisian Otomatis
+        </button>
+        <button id="stopBtn" class="btn btn-outline" style="padding: 0.65rem 1.5rem; color: var(--danger); border-color: var(--danger);" disabled>
+          Hentikan / Nonaktifkan
+        </button>
+        <button id="clearLogBtn" class="btn btn-outline" style="padding: 0.65rem 1rem;">
+          Bersihkan Log
+        </button>
+      </div>
+
+      <div style="margin-top: 1rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--gray-600); font-weight: 500;">
+          <span id="progressText">Progress: 0 / 0 Siswa (0%)</span>
+          <span id="speedText">Status: Standby</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Real-time Stats Grid -->
+    <div class="grid-2">
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
+        <div class="stat-box">
+          <div class="stat-number" id="statSuccess" style="color: var(--success);">0</div>
+          <div class="stat-label">Berhasil</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number" id="statSkip" style="color: var(--accent);">0</div>
+          <div class="stat-label">Sudah Ada (Skip)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number" id="statFail" style="color: var(--danger);">0</div>
+          <div class="stat-label">Gagal</div>
+        </div>
+      </div>
+
+      <div class="stat-box" style="display: flex; flex-direction: column; justify-content: center; text-align: left; padding: 1rem 1.5rem;">
+        <div style="font-size: 0.8rem; color: var(--gray-500); margin-bottom: 0.35rem;">Koneksi Google Apps Script</div>
+        <div style="font-size: 0.85rem; font-weight: 600; color: var(--gray-800); word-break: break-all;" id="endpointInfo">Memeriksa...</div>
+      </div>
+    </div>
+
+    <!-- Live Log Console -->
+    <div class="card" style="padding: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <span style="font-size: 0.85rem; font-weight: 600; color: var(--gray-700);">Live Console Log (Aktivitas Pengiriman)</span>
+        <span style="font-size: 0.75rem; color: var(--gray-500);">Auto-scroll aktif</span>
+      </div>
+      <div class="console-log" id="consoleLog">
+        <div class="log-line log-info">[INFO] Simulator siap digunakan. Pastikan status dalam posisi AKTIF lalu klik "Mulai Pengisian Otomatis".</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script>
+    // DATA 357 SISWA LENGKAP
+    const ALL_STUDENTS = [{"uid":"12452","nama":"AHMAD HISYAM AIZAR","kelas":"X-1","tingkat":10,"jk":"L"},{"uid":"12463","nama":"ANINDYA KHANZA AZ ZHARIIFAH","kelas":"X-1","tingkat":10,"jk":"P"},{"uid":"12465","nama":"ARAYA CITRA PUSPITASARI","kelas":"X-1","tingkat":10,"jk":"P"},{"uid":"12466","nama":"ARDELLINO SYAPUTRA","kelas":"X-1","tingkat":10,"jk":"L"},{"uid":"12470","nama":"ASYIFA AURELIA ARVA","kelas":"X-1","tingkat":10,"jk":"P"},{"uid":"12491","nama":"DWI RAHMANIA AULIA","kelas":"X-1","tingkat":10,"jk":"P"},{"uid":"12502","nama":"FATWAN KHULAFA' AL BALADY","kelas":"X-1","tingkat":10,"jk":"L"},{"uid":"12511","nama":"IMAM BARRY WAFAUL WAFAK","kelas":"X-1","tingkat":10,"jk":"L"},{"uid":"12519","nama":"KEYSHA KHANSA NAHDA YUFA","kelas":"X-1","tingkat":10,"jk":"P"},{"uid":"12532","nama":"MIRANDA CALYSTA PUTRI","kelas":"X-1","tingkat":10,"jk":"P"},{"uid":"12538","nama":"MUHAMMAD EMIR ISMAT LUBAID","kelas":"X-1","tingkat":10,"jk":"L"},{"uid":"12542","nama":"MOH. FIKRUL ZAM ZAMI","kelas":"X-1","tingkat":10,"jk":"L"},{"uid":"12544","nama":"MUHAMMAD HILMI","kelas":"X-1","tingkat":10,"jk":"L"},{"uid":"12552","nama":"MUHAMMAD TANTOWI FARID JAUHARI","kelas":"X-1","tingkat":10,"jk":"L"},{"uid":"12553","nama":"MUHAMMAD YUSRI ASYFA","kelas":"X-1","tingkat":10,"jk":"L"},{"uid":"12563","nama":"NASYA ZAUZAHRO AIDANUR IRWANTO","kelas":"X-1","tingkat":10,"jk":"P"},{"uid":"12582","nama":"RIZKA NAILUL ULYA","kelas":"X-1","tingkat":10,"jk":"P"},{"uid":"12584","nama":"SAIF ALFATH","kelas":"X-1","tingkat":10,"jk":"L"},{"uid":"12590","nama":"SHERHAN GHANIYYU ATMA","kelas":"X-1","tingkat":10,"jk":"L"},{"uid":"12599","nama":"TSABITA MAYLAFFAYZA DAIMAH","kelas":"X-1","tingkat":10,"jk":"P"},{"uid":"12604","nama":"YOSI AYU WANDIRA","kelas":"X-1","tingkat":10,"jk":"P"},{"uid":"12609","nama":"ZAHRINATUS SYAFA ANNIDA","kelas":"X-1","tingkat":10,"jk":"P"},{"uid":"12472","nama":"ATHAYA LIANDRA PUTRI ARDIYATI WIBOWO","kelas":"X-2","tingkat":10,"jk":"P"},{"uid":"12476","nama":"AULIA ZULFA YASMIN","kelas":"X-2","tingkat":10,"jk":"P"},{"uid":"12477","nama":"AURELIA AISY MUMTAZ","kelas":"X-2","tingkat":10,"jk":"P"},{"uid":"12480","nama":"AZKA SYAFIQ RAYYAN","kelas":"X-2","tingkat":10,"jk":"L"},{"uid":"12493","nama":"EMIR SATRIA TAMBUNAN","kelas":"X-2","tingkat":10,"jk":"L"},{"uid":"12494","nama":"FAHMI AL DIN HUSAIN PUTRA WARDANI","kelas":"X-2","tingkat":10,"jk":"L"},{"uid":"12505","nama":"GLADIZIA AZZAHRA PURNOMO","kelas":"X-2","tingkat":10,"jk":"P"},{"uid":"12507","nama":"HAFSHA AZZAHRA","kelas":"X-2","tingkat":10,"jk":"P"},{"uid":"12515","nama":"JNO KENANDITO SUHUD","kelas":"X-2","tingkat":10,"jk":"L"},{"uid":"12527","nama":"MAHATMA SATRIA WARDHANA","kelas":"X-2","tingkat":10,"jk":"L"},{"uid":"12534","nama":"MUHAMMAD YAHYA ELANG MAULANA","kelas":"X-2","tingkat":10,"jk":"L"},{"uid":"12550","nama":"MUHAMMAD SHAFA FAIZATUNNAJA PUTRA AKBAR","kelas":"X-2","tingkat":10,"jk":"L"},{"uid":"12561","nama":"NAMIRA HILWA","kelas":"X-2","tingkat":10,"jk":"P"},{"uid":"12569","nama":"NUR AZMI RIYANTO","kelas":"X-2","tingkat":10,"jk":"L"},{"uid":"12587","nama":"SAVIERA NADHIA ZULVA","kelas":"X-2","tingkat":10,"jk":"P"},{"uid":"12589","nama":"SHARANI QUENICA PUTRI","kelas":"X-2","tingkat":10,"jk":"P"},{"uid":"12591","nama":"SINTA DEWI PELANGI","kelas":"X-2","tingkat":10,"jk":"P"},{"uid":"12601","nama":"XIKE AZZA GRESSIA","kelas":"X-2","tingkat":10,"jk":"P"},{"uid":"12606","nama":"ZAFEERA NISWA SALSABILA ARROSIDI","kelas":"X-2","tingkat":10,"jk":"P"},{"uid":"12610","nama":"ZHAFIRA PUTRI WIJAYA","kelas":"X-2","tingkat":10,"jk":"P"},{"uid":"12450","nama":"AESAR RAFIE BRAHMANTYA","kelas":"X-3","tingkat":10,"jk":"L"},{"uid":"12454","nama":"AHMAD JAUHAR AL-A'LA","kelas":"X-3","tingkat":10,"jk":"L"},{"uid":"12458","nama":"AISYAH MAULIDAH RAHMAWATI","kelas":"X-3","tingkat":10,"jk":"P"},{"uid":"12459","nama":"AISYAH RAHMA AZHARA","kelas":"X-3","tingkat":10,"jk":"P"},{"uid":"12464","nama":"AQEELA AZKA ARDHANA","kelas":"X-3","tingkat":10,"jk":"L"},{"uid":"12469","nama":"ARYA MIZZANY","kelas":"X-3","tingkat":10,"jk":"L"},{"uid":"12479","nama":"AZKA RAMADHANI JUNIAWAN","kelas":"X-3","tingkat":10,"jk":"P"},{"uid":"12484","nama":"BETHARI MANGGAR WIKANTO","kelas":"X-3","tingkat":10,"jk":"P"},{"uid":"12490","nama":"DINAR KHOIRUNNISA","kelas":"X-3","tingkat":10,"jk":"P"},{"uid":"12492","nama":"DZAKY ZAFRAN ALFARIZKY","kelas":"X-3","tingkat":10,"jk":"L"},{"uid":"12504","nama":"FILIA FATIN QAIS EL WAFA","kelas":"X-3","tingkat":10,"jk":"P"},{"uid":"12508","nama":"HILAL ACHMAD FAKHRUDIN","kelas":"X-3","tingkat":10,"jk":"L"},{"uid":"12509","nama":"IBRAHIM ATTAR BRAMANTYO","kelas":"X-3","tingkat":10,"jk":"L"},{"uid":"12514","nama":"JEVANYA AVRA FREDELINA QUELENE","kelas":"X-3","tingkat":10,"jk":"P"},{"uid":"12516","nama":"KEISHA SHAKILA HARUN","kelas":"X-3","tingkat":10,"jk":"P"},{"uid":"12528","nama":"MAS RAJA FIRMANSYAH","kelas":"X-3","tingkat":10,"jk":"L"},{"uid":"12536","nama":"MUHAMMAD AZKA ALFARIZI","kelas":"X-3","tingkat":10,"jk":"L"},{"uid":"12546","nama":"MUHAMMAD NAUFAL LABIB","kelas":"X-3","tingkat":10,"jk":"L"},{"uid":"12549","nama":"MUHAMMAD RIZQI RAMADHAN","kelas":"X-3","tingkat":10,"jk":"L"},{"uid":"12556","nama":"NADIN AMIRA RAHMADINAH","kelas":"X-3","tingkat":10,"jk":"P"},{"uid":"12560","nama":"NAJWA ASYILAH CHAIRANI","kelas":"X-3","tingkat":10,"jk":"P"},{"uid":"12565","nama":"NAUREEN TARA YALENA","kelas":"X-3","tingkat":10,"jk":"P"},{"uid":"12574","nama":"QARSAFAH AL ZAHLIYAH RACHMAWATI ZULKARNAIN","kelas":"X-3","tingkat":10,"jk":"P"},{"uid":"12579","nama":"REYHAAN ASMAR PRIBADI PUTRA","kelas":"X-3","tingkat":10,"jk":"L"},{"uid":"12588","nama":"SHABRINA PUTRI AL GHIFFARY","kelas":"X-3","tingkat":10,"jk":"P"},{"uid":"12598","nama":"TSABITA HASNAH HENDITA","kelas":"X-3","tingkat":10,"jk":"P"},{"uid":"12600","nama":"USAID RAIHAAN DAMIS","kelas":"X-3","tingkat":10,"jk":"L"},{"uid":"12602","nama":"YASMIN DINAAR ARAFAH","kelas":"X-3","tingkat":10,"jk":"P"},{"uid":"12605","nama":"YUSUF","kelas":"X-3","tingkat":10,"jk":"L"},{"uid":"12611","nama":"ZIDNY ILMA","kelas":"X-3","tingkat":10,"jk":"P"},{"uid":"12453","nama":"AHMAD IHSAN AR ROSIDY","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12455","nama":"AHMAD NAUFAL FARRAS","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12461","nama":"ALLSEME NIRNIAK SUCAHYA","kelas":"X-4","tingkat":10,"jk":"P"},{"uid":"12467","nama":"ARGYA NAWAL SATYADHARMA","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12468","nama":"ARYA DAMAR WIRAWAN","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12473","nama":"ATHAYA SYHAILA DZAKWAN","kelas":"X-4","tingkat":10,"jk":"P"},{"uid":"12475","nama":"ATHIKA NADIA RAHMA","kelas":"X-4","tingkat":10,"jk":"P"},{"uid":"12478","nama":"AZKA FUADY AZIZ","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12486","nama":"CALVINO AZMI GANI PRATAMA","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12488","nama":"DAYANA BATRISYA AN-NISA FITRI","kelas":"X-4","tingkat":10,"jk":"P"},{"uid":"12498","nama":"FARHAN RAFI IRFANSYAH","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12510","nama":"IBRAHIM DZAKY KAISAN","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12518","nama":"KEYSHA AZZAHRA","kelas":"X-4","tingkat":10,"jk":"P"},{"uid":"12533","nama":"MOH. NIZAR AHZA AL AZZAM","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12541","nama":"MUHAMMAD FERRO AL AFGHANI","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12543","nama":"MUHAMMAD HABIBI AKBAR","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12557","nama":"NAFASHA PUTRI DHAVINA ALFARIZA","kelas":"X-4","tingkat":10,"jk":"P"},{"uid":"12559","nama":"NAFLAH KHOIRUNNISA RAHMANDA","kelas":"X-4","tingkat":10,"jk":"P"},{"uid":"12562","nama":"NASHWA ALIYA PUTRI","kelas":"X-4","tingkat":10,"jk":"P"},{"uid":"12564","nama":"NAURA AZKA SILMI","kelas":"X-4","tingkat":10,"jk":"P"},{"uid":"12566","nama":"NAYLA ZHAFIRAH PUTRI PAHALA","kelas":"X-4","tingkat":10,"jk":"P"},{"uid":"12570","nama":"NUR FAIZAH HANIA","kelas":"X-4","tingkat":10,"jk":"P"},{"uid":"12571","nama":"NURIL WAHYUNI AYU MAHASTI","kelas":"X-4","tingkat":10,"jk":"P"},{"uid":"12573","nama":"ORVALA INDRAFATA CHALIK","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12577","nama":"RAIHAN ARIBUDI SULANDOKO","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12578","nama":"RAKA MUHAMMAD WIGUNA","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12586","nama":"SASHIMI ALENA ALBAQIS","kelas":"X-4","tingkat":10,"jk":"P"},{"uid":"12592","nama":"SULTAN WIRA NURRAMADHAN","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12597","nama":"THORIQ BIL FURQON LESMANA","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12613","nama":"RIZKY FITRAH ANUGRAH","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12614","nama":"ABRAR RAYYAN","kelas":"X-4","tingkat":10,"jk":"L"},{"uid":"12451","nama":"AGRA MALIKA ABRAR","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12456","nama":"AHMAD NAZHMI ILMI INSANI","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12457","nama":"AHMAD RAFIF ATHALLAH","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12460","nama":"ALDO ARIES HARIONO","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12471","nama":"ATHALLAH RAFFASYA ARDHIANTO","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12474","nama":"ATHAYA TABINA ZHUFAIROH","kelas":"X-5","tingkat":10,"jk":"P"},{"uid":"12481","nama":"BALKIZH AULIA PUTRI","kelas":"X-5","tingkat":10,"jk":"P"},{"uid":"12496","nama":"FANNI TISYA SAUNAH","kelas":"X-5","tingkat":10,"jk":"P"},{"uid":"12500","nama":"FARIS RACHMAN AL FARUQ","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12512","nama":"IRZE MAULIDINA EL HAMRO","kelas":"X-5","tingkat":10,"jk":"P"},{"uid":"12513","nama":"JESSY RUSDA TRISNA DINI","kelas":"X-5","tingkat":10,"jk":"P"},{"uid":"12517","nama":"KEISYA ALIZA PUTRI","kelas":"X-5","tingkat":10,"jk":"P"},{"uid":"12520","nama":"KHAYRA AYESHA FAADHILLAH","kelas":"X-5","tingkat":10,"jk":"P"},{"uid":"12522","nama":"MUHAMMAD AS'AD IZZUL HAQ D","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12523","nama":"MOCH. DAVIN JERVIS GAUTAMA","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12525","nama":"M SYAHRUL ZIBRAN AL HAFIZ","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12526","nama":"MUHAMMAD ZYAN ZAFFIRE ASSYAKIR","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12539","nama":"MUHAMMAD FACHRI BUMI PUTRA","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12545","nama":"MUHAMMAD NAUFAL AR ROYHAN","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12547","nama":"MUHAMMAD NELSON MAHATHMA YUDHA","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12548","nama":"MUHAMMAD RADHO ARDIANSYAH","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12554","nama":"MUKHAMMAD DHAFIN AR RIZQI","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12558","nama":"NAFIZA CHIARA PUTRI","kelas":"X-5","tingkat":10,"jk":"P"},{"uid":"12572","nama":"OCTAVIAN NUR HARTONO","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12576","nama":"RAHMANIA SHAFA AZZAHRA","kelas":"X-5","tingkat":10,"jk":"P"},{"uid":"12580","nama":"REYHANA JASMINE","kelas":"X-5","tingkat":10,"jk":"P"},{"uid":"12583","nama":"SAFIRA CANDRA FUADAH","kelas":"X-5","tingkat":10,"jk":"P"},{"uid":"12594","nama":"SYEIKH","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12596","nama":"TANISHA VANIA GELSI","kelas":"X-5","tingkat":10,"jk":"P"},{"uid":"12603","nama":"YASMIN QUDSI VINA","kelas":"X-5","tingkat":10,"jk":"P"},{"uid":"12612","nama":"ZIYADATUN NA'IMAH","kelas":"X-5","tingkat":10,"jk":"P"},{"uid":"12537","nama":"MUHAMMAD BAQIR ASH SHADR","kelas":"X-5","tingkat":10,"jk":"L"},{"uid":"12448","nama":"ABY ZHAR BAHASUAN","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12449","nama":"ACHMAD ZAIN MUGEBEL","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12482","nama":"BARIQ FAJAR ABDULLAH","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12483","nama":"BAYU SUKMO BAGUS SATRIO","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12485","nama":"BINTANG EVANDER AMUK NUGROHO","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12487","nama":"DANIYAH MUHAMMAD FAUZI","kelas":"X-6","tingkat":10,"jk":"P"},{"uid":"12489","nama":"DIMAS MUHAMMAD","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12495","nama":"FAIZ ARDI WINATA","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12497","nama":"FARA ZAIMAH AURELIA","kelas":"X-6","tingkat":10,"jk":"P"},{"uid":"12499","nama":"FARHANDHAH HASNA NABILA","kelas":"X-6","tingkat":10,"jk":"P"},{"uid":"12501","nama":"FATHIR AIDIL FITRAH","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12503","nama":"FERLI PUTRI ARNIS","kelas":"X-6","tingkat":10,"jk":"P"},{"uid":"12521","nama":"KHOIRUNNISA AZAHRAA","kelas":"X-6","tingkat":10,"jk":"P"},{"uid":"12524","nama":"MUHAMMAD KAYZA AL JABBAR","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12529","nama":"MAULANA AL HAIDAR FISABILILLAH","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12530","nama":"MAZAYA NISMAH MAULIDIYAH","kelas":"X-6","tingkat":10,"jk":"P"},{"uid":"12531","nama":"MELVI ROSITA OCTAVIANI","kelas":"X-6","tingkat":10,"jk":"P"},{"uid":"12535","nama":"MUHAMMAD ALVINO RAHADIAN KHALID","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12540","nama":"MUHAMMAD FAUZAN FADILLAH DIANDRA","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12551","nama":"MUHAMMAD SYAROFUL ANAM","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12555","nama":"NABILA AULIA NAHDA","kelas":"X-6","tingkat":10,"jk":"P"},{"uid":"12567","nama":"NISA NAFAZATUL JANNAH","kelas":"X-6","tingkat":10,"jk":"P"},{"uid":"12568","nama":"NOVALITA TRIA KHAIRUNNISA' PERMATASARI","kelas":"X-6","tingkat":10,"jk":"P"},{"uid":"12575","nama":"RAFA OKTAVINO PANGGABEAN","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12581","nama":"RIFKY RIZQU OKTANIAN","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12585","nama":"SALMA FAHMIDA","kelas":"X-6","tingkat":10,"jk":"P"},{"uid":"12593","nama":"SYAIFUDIN IQBAL","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12595","nama":"TALITA DZAHABIYYAH SYAUKANI","kelas":"X-6","tingkat":10,"jk":"P"},{"uid":"12607","nama":"ZAHIRA FARIDIA FIRDAUSY","kelas":"X-6","tingkat":10,"jk":"P"},{"uid":"12608","nama":"ZAHRA GRESIA","kelas":"X-6","tingkat":10,"jk":"P"},{"uid":"12506","nama":"HAFIZ MAHADEVANO RUDYANSYAH","kelas":"X-6","tingkat":10,"jk":"L"},{"uid":"12252","nama":"AIMA NUR ALIFTA TUWATUN NISA","kelas":"XI Saintek 1","tingkat":11,"jk":"P"},{"uid":"12257","nama":"ALEESHA MEDINA SUTIONO","kelas":"XI Saintek 1","tingkat":11,"jk":"P"},{"uid":"12262","nama":"AMANDA FARAHDHIA","kelas":"XI Saintek 1","tingkat":11,"jk":"P"},{"uid":"12275","nama":"ATHAYA MIHLAYEL AXELA NAYAKA","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12280","nama":"BERYL ALVI RAFANSYAH","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12281","nama":"BIRRU KAUTSAR ALFATH","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12290","nama":"EKA RIZKY APRILIANI","kelas":"XI Saintek 1","tingkat":11,"jk":"P"},{"uid":"12292","nama":"ERIKA PUTRI MAGHFIROH","kelas":"XI Saintek 1","tingkat":11,"jk":"P"},{"uid":"12298","nama":"FARAFISYAH BINTA ALRIANTI","kelas":"XI Saintek 1","tingkat":11,"jk":"P"},{"uid":"12301","nama":"FARROS ZAGHLUL WALIYYUDIN","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12303","nama":"FERGIE ACHMAD PRASETYO","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12304","nama":"FIRDA FIRMANUSSYIFA'","kelas":"XI Saintek 1","tingkat":11,"jk":"P"},{"uid":"12306","nama":"GARNETA AYUDIA CAHYANI","kelas":"XI Saintek 1","tingkat":11,"jk":"P"},{"uid":"12310","nama":"HAFIZ ALVIANO FIRST RADITYANATA","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12339","nama":"M. RIZQY DHIYA'UL HAQ","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12344","nama":"MAULIDYA OZORA PUTRI","kelas":"XI Saintek 1","tingkat":11,"jk":"P"},{"uid":"12350","nama":"MOH RAIHAN SAMI FIRDAUS","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12355","nama":"MUHAMMAD ALWAN HASRIANSYAH","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12359","nama":"MUHAMMAD FADHIL EL SYARIF","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12366","nama":"MUHAMMAD IBAD MUTAWWALIDIN","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12367","nama":"MUHAMMAD IKMAL NIZZAMULLAH","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12372","nama":"MUHAMMAD SHAFWAN MAULANA ZHAFRAN","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12373","nama":"MUHAMMAD ZAFRAN MARDIANSYAH","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12374","nama":"NAAILAH SHAFAA RAMADHANI","kelas":"XI Saintek 1","tingkat":11,"jk":"P"},{"uid":"12380","nama":"NAUFAL ALBIF AL FAROBI AGUS","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12388","nama":"NURAINI AN NISA PUTRI","kelas":"XI Saintek 1","tingkat":11,"jk":"P"},{"uid":"12389","nama":"NURUL ANDHINI","kelas":"XI Saintek 1","tingkat":11,"jk":"P"},{"uid":"12400","nama":"RAIHAN IKHSAN HIDAYAT","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12413","nama":"SALSABILA FIRDAUS","kelas":"XI Saintek 1","tingkat":11,"jk":"P"},{"uid":"12419","nama":"SHIDQI RAKA SYAHPUTRA","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12422","nama":"SULTAN AQIEL MUHAMMAD","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12423","nama":"SULTAN HAIDAR MUTAWAKKIL","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12429","nama":"UBAIDILLAH AKMAL FATTAN","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12441","nama":"MUHAMMAD AFDHAL RABBANI PRAYITNO","kelas":"XI Saintek 1","tingkat":11,"jk":"L"},{"uid":"12248","nama":"ADIS RAKHA HARDIYANTA","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12254","nama":"AISYAH FAUZIYAH ARDZI","kelas":"XI Saintek 2","tingkat":11,"jk":"P"},{"uid":"12256","nama":"AL TAUFIQ SYARIFUDDIN","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12272","nama":"ARSYAD FITROH MUHAMMAD PURWONO","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12273","nama":"ARYA BIMA WIJAYA","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12278","nama":"BAIHAQQY DIZHAN AZKA KHAIRI","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12284","nama":"DAI BRILLIANT RIZKI IRSANDY","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12289","nama":"EDITA LUNA RAHMADHANI","kelas":"XI Saintek 2","tingkat":11,"jk":"P"},{"uid":"12302","nama":"FASYA NAUBIYAN CAHYAWAN","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12308","nama":"GIDEON BAGAS BAWENGAN","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12312","nama":"HAIDAR ZADA ATHAILLAH","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12325","nama":"KHANSA DISTIAN ARYAPUTRA","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12341","nama":"MOCHAMMAD SABIQ AL NAUFAL","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12354","nama":"MUHAMMAD AIDAN AL BANIIN","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12360","nama":"MUHAMMAD FAKHRY AKBAR","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12371","nama":"MUHAMMAD RIZKY FARDAN","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12378","nama":"NARENDHRA ARYASATYA ATHARAMA","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12385","nama":"NIKITA ALFINA SYAHRIANI","kelas":"XI Saintek 2","tingkat":11,"jk":"P"},{"uid":"12387","nama":"NUR IZZATI HAYATUS SOPHIA","kelas":"XI Saintek 2","tingkat":11,"jk":"P"},{"uid":"12396","nama":"RADEN AHMAD BERYL SAFARAZ","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12398","nama":"RAFA FATHAN AL GIFFARI","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12414","nama":"SALSABILA SYAPUTRI","kelas":"XI Saintek 2","tingkat":11,"jk":"P"},{"uid":"12424","nama":"SULTHAN KHINAN HANAFI","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12425","nama":"SURYA SATRIA PRADANA AL RIANTO","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12430","nama":"VALKYRIE AGNI HER SAMIRANA PERTIWI","kelas":"XI Saintek 2","tingkat":11,"jk":"P"},{"uid":"12431","nama":"WIRADITYA WIJAYA","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12433","nama":"YASMINE AZZAHRA DISTIAN","kelas":"XI Saintek 2","tingkat":11,"jk":"P"},{"uid":"12442","nama":"JIBRIL DANESWARA JUNAEDI","kelas":"XI Saintek 2","tingkat":11,"jk":"L"},{"uid":"12249","nama":"AFIQ RAYYAN MA'ARIF","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12253","nama":"AISYAH AQILA LATIF","kelas":"XI Saintek 3","tingkat":11,"jk":"P"},{"uid":"12255","nama":"AKHDANY KENZIE KAYANA","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12258","nama":"ALIFATUROHMAN HADI KURNIAWAN","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12264","nama":"ANDANA ARSYAD RASENDRIYAH","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12265","nama":"ANDRIAN NAUFALI ROCHMAN","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12266","nama":"ANINDIA NUR FATIHAH","kelas":"XI Saintek 3","tingkat":11,"jk":"P"},{"uid":"12270","nama":"AQILA HUBBATUL LATIFAH","kelas":"XI Saintek 3","tingkat":11,"jk":"P"},{"uid":"12277","nama":"AZFAR CONSTANTINE ALGHIFARI","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12287","nama":"DIKA ADINATA PUTRA KASIHA","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12288","nama":"DIMAS RADITHYA PRADANA","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12315","nama":"HANOONA DWIKE MARETA","kelas":"XI Saintek 3","tingkat":11,"jk":"P"},{"uid":"12321","nama":"IZZUDDIN AL FATIH","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12326","nama":"KHANSA ZAHIRAH NAJLA","kelas":"XI Saintek 3","tingkat":11,"jk":"P"},{"uid":"12334","nama":"MUHAMMAD GALVIN RIZA ALAMSYAH","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12335","nama":"MUHAMMAD GAVIN ISLAMAY NARARYA","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12338","nama":"M. RAKHA AR RAYYAN PUTRA ARIANTO","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12370","nama":"MOCHAMMAD RANGGA DWI GUNAWAN","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12381","nama":"NAURA JIHAN FARAH RAMADHANI","kelas":"XI Saintek 3","tingkat":11,"jk":"P"},{"uid":"12382","nama":"NAURA ZAMI SAFA FITRIYANTARA","kelas":"XI Saintek 3","tingkat":11,"jk":"P"},{"uid":"12383","nama":"NAZLILLAH AISYAH JOHAR","kelas":"XI Saintek 3","tingkat":11,"jk":"P"},{"uid":"12384","nama":"NEHAN ATHAYANTA NURYANTO","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12390","nama":"NURUL FALAH AZZAKIYAH ARDIANSYAH","kelas":"XI Saintek 3","tingkat":11,"jk":"P"},{"uid":"12399","nama":"RAFIKA NOVIYA RHODIYAHTUL EFFENDI","kelas":"XI Saintek 3","tingkat":11,"jk":"P"},{"uid":"12401","nama":"RANIAH KHAIRUNISA","kelas":"XI Saintek 3","tingkat":11,"jk":"P"},{"uid":"12406","nama":"REZA AHMAD AL HAKIM","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12407","nama":"RICKO GAHRAL ADISYACH","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12410","nama":"RIZQI FANI ANUGRAH","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12435","nama":"ZAHRAN SHABIR ATHALLAH ALWAN","kelas":"XI Saintek 3","tingkat":11,"jk":"L"},{"uid":"12245","nama":"ABYANUL HAKIM","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12250","nama":"AHMAD HAIKAL FALAKH","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12261","nama":"ALYA AYUDYA MAHARANI","kelas":"XI Saintek 4","tingkat":11,"jk":"P"},{"uid":"12263","nama":"AMIRA ZAHWAH KAYYASAH","kelas":"XI Saintek 4","tingkat":11,"jk":"P"},{"uid":"12279","nama":"BELA ANGIE PARAHITA","kelas":"XI Saintek 4","tingkat":11,"jk":"P"},{"uid":"12293","nama":"FA'IZAH AMIRAH","kelas":"XI Saintek 4","tingkat":11,"jk":"P"},{"uid":"12296","nama":"FAJAR ARYANSYAH PUTRA","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12297","nama":"FALIZAH RAHMAN","kelas":"XI Saintek 4","tingkat":11,"jk":"P"},{"uid":"12305","nama":"FRAYA PARAMITHA WINDHARTA","kelas":"XI Saintek 4","tingkat":11,"jk":"P"},{"uid":"12307","nama":"GAVIN WILIAN BASKARA","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12314","nama":"HANDARU ZAKI CAHYA GUMELAR","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12316","nama":"HANUM AISYAWA YULDIONO","kelas":"XI Saintek 4","tingkat":11,"jk":"P"},{"uid":"12318","nama":"IBRAHIM RIDHO HASAN","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12320","nama":"IVAN LOUISE HARIS WICAKSONO","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12349","nama":"MIRZA AUFA MURTAZA","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12362","nama":"MUHAMMAD FIRASH ARDHIA AQSHO TYSA LUBIS","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12363","nama":"MUHAMMAD GIBRAN FATIH","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12364","nama":"MUHAMMAD HASBI AKBAR SITEPU","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12369","nama":"MUHAMMAD PRAYOGA SEJATI","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12379","nama":"NATANARARYA LANGIT SATYAKI","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12394","nama":"PUTRI VIVIAN NUR RAHMA","kelas":"XI Saintek 4","tingkat":11,"jk":"P"},{"uid":"12397","nama":"RAFA BENZEMA PUTRA PRADANA","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12402","nama":"RAYHAN MAULANA AL ASY'ARI","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12405","nama":"REYVAN RAMDHAN MAULANA","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12427","nama":"TALITHA NEYSA SYAKIRA ATMOJO","kelas":"XI Saintek 4","tingkat":11,"jk":"P"},{"uid":"12428","nama":"TANAYA KANIA RACHMANI","kelas":"XI Saintek 4","tingkat":11,"jk":"P"},{"uid":"12432","nama":"YAFI ASRA HABIBILLAH","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12434","nama":"YUSRA MUMTAZ RAMADHAN","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12436","nama":"ZANA RAHMADANI BARKAH LYLA","kelas":"XI Saintek 4","tingkat":11,"jk":"P"},{"uid":"12444","nama":"A. NAUFAL ATALLAH FIKRI","kelas":"XI Saintek 4","tingkat":11,"jk":"L"},{"uid":"12247","nama":"ADINDA LUTFI OXCHARIL","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12251","nama":"AHMAD WILDANUS SHIHAB","kelas":"XI Soshum 1","tingkat":11,"jk":"L"},{"uid":"12269","nama":"ANNISA FITIYA SEKARARUM","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12282","nama":"CANTIKA DWIYONO AZALYA SAFIRA","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12283","nama":"CARISSA AURELIA PUTRI","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12286","nama":"DELVIANO FIDANZA DA LOPES","kelas":"XI Soshum 1","tingkat":11,"jk":"L"},{"uid":"12294","nama":"FAIRUZ JASMINE KHOIRUNNISA'","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12295","nama":"FAIZA AMIRA SUROSO","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12300","nama":"FARDHANA KEYANO FIFALDY","kelas":"XI Soshum 1","tingkat":11,"jk":"L"},{"uid":"12309","nama":"GREENALDO SYIHABUDDIN GHIFARY","kelas":"XI Soshum 1","tingkat":11,"jk":"L"},{"uid":"12313","nama":"HANA KAMILATUN NISA`","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12317","nama":"HANUM PUTRI RAMADHANI","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12322","nama":"KANAYA SYALWA ANANTI","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12328","nama":"KHUMAIRA ZUKHRUFI MUIZMA","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12330","nama":"LUNA CANDRA SYAFAATASALIM","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12333","nama":"M. DAFA PRAMUDITIYA","kelas":"XI Soshum 1","tingkat":11,"jk":"L"},{"uid":"12336","nama":"MUHAMMAD JANKY DAUSAT","kelas":"XI Soshum 1","tingkat":11,"jk":"L"},{"uid":"12340","nama":"MUHAMMAD SHADDAM ATTALLAH","kelas":"XI Soshum 1","tingkat":11,"jk":"L"},{"uid":"12351","nama":"MOHAMMAD SEPTIAN NURIMANSYAH","kelas":"XI Soshum 1","tingkat":11,"jk":"L"},{"uid":"12353","nama":"MUHAMMAD AGHFA FIRDAUS","kelas":"XI Soshum 1","tingkat":11,"jk":"L"},{"uid":"12356","nama":"MUHAMMAD DAFFA KAMALUDDIN RAMDHANI","kelas":"XI Soshum 1","tingkat":11,"jk":"L"},{"uid":"12357","nama":"MUHAMMAD DIAS CLEARESTA","kelas":"XI Soshum 1","tingkat":11,"jk":"L"},{"uid":"12365","nama":"MUHAMMAD HASBI SETIAWAN","kelas":"XI Soshum 1","tingkat":11,"jk":"L"},{"uid":"12368","nama":"MUHAMMAD IRSYAD IFTIKHARUDDIN","kelas":"XI Soshum 1","tingkat":11,"jk":"L"},{"uid":"12375","nama":"NADHIFA NUR ATHIRAH","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12376","nama":"NADHIRA NUR ALIFAH","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12393","nama":"PUTRI JANNAH PUSPITASARI","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12408","nama":"RIZKA MUTHIA RAIHAN","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12412","nama":"SAFIRA FITHROTUS TSANIYAH","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12415","nama":"SANIE ANINDYA ARTANTI","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12416","nama":"SAYYIDAH AN NADHIFAH","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12418","nama":"SHEILA MELLYSA PUTRI","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12426","nama":"SYAFIRA AZZAHRA","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12445","nama":"KEYLA NUR FATIMATUZZAHRA","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12446","nama":"HAILAH AFIFAH HAKIM","kelas":"XI Soshum 1","tingkat":11,"jk":"P"},{"uid":"12447","nama":"HILMIYANDI","kelas":"XI Soshum 1","tingkat":11,"jk":"L"},{"uid":"12243","nama":"ABIDAH ULYA","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12244","nama":"ABRIELIA FI SABILILLAH ARDHINAR","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12246","nama":"ADEEL DANISH PUTRA","kelas":"XI Soshum 2","tingkat":11,"jk":"L"},{"uid":"12259","nama":"ALMIRA NAQIYAH FIRZANAH","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12260","nama":"ALUNA GHASSANI ARMAGITA","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12267","nama":"ANISA DWI ANDINI","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12268","nama":"ANJANI QUINN AZ ZAHRA","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12271","nama":"ARDHIAN RYADANA PRAMADITHA","kelas":"XI Soshum 2","tingkat":11,"jk":"L"},{"uid":"12276","nama":"AVIZA AQILAH PUTRI MAKSUN","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12285","nama":"DAVINA RAHMITA","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12291","nama":"ELVIRA AURELYN PUTRI DYAN RAMADHANI","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12299","nama":"FARAND GALE NUGRAHA","kelas":"XI Soshum 2","tingkat":11,"jk":"L"},{"uid":"12319","nama":"IMTINAN HAFID BAHASUAN","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12324","nama":"KEMAS ASYROF UBAIDILLAH","kelas":"XI Soshum 2","tingkat":11,"jk":"L"},{"uid":"12327","nama":"KHAZALIQA AL ARIF","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12331","nama":"MUHAMMAD AKBAR FADHILLAH SAPUTRA","kelas":"XI Soshum 2","tingkat":11,"jk":"L"},{"uid":"12332","nama":"MUHAMMAD BINTANG SULTHONI","kelas":"XI Soshum 2","tingkat":11,"jk":"L"},{"uid":"12337","nama":"M.NABIL FADLULLAH ARIANSYAH","kelas":"XI Soshum 2","tingkat":11,"jk":"L"},{"uid":"12342","nama":"MAIMANABILA APRILIA","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12345","nama":"MAYDENA VALERIE ALINE DJUNAIDI","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12346","nama":"MICHELLE PUTRI CHANDRA","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12347","nama":"MIFTAH FERROS MURTADHO ISMAIL","kelas":"XI Soshum 2","tingkat":11,"jk":"L"},{"uid":"12348","nama":"MIKAEL AR RIDHO","kelas":"XI Soshum 2","tingkat":11,"jk":"L"},{"uid":"12358","nama":"MUHAMMAD DIMAS WASI'","kelas":"XI Soshum 2","tingkat":11,"jk":"L"},{"uid":"12361","nama":"MUHAMMAD FANANI EL-HIKAM","kelas":"XI Soshum 2","tingkat":11,"jk":"L"},{"uid":"12377","nama":"NAIRA SHETRA AL FAWWAZ","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12392","nama":"PRINCE MUHAMMAD KHAYRU","kelas":"XI Soshum 2","tingkat":11,"jk":"L"},{"uid":"12395","nama":"QUINSHA NAURA PUTRI","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12404","nama":"REYHAN ALVARO RIZKY PERMANA","kelas":"XI Soshum 2","tingkat":11,"jk":"L"},{"uid":"12409","nama":"RIZKY ARDIANSYAH HARIONO","kelas":"XI Soshum 2","tingkat":11,"jk":"L"},{"uid":"12411","nama":"SAFA NABILA IQLIMA","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12417","nama":"SHANIA CONCETTA PICAULY","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12420","nama":"SOFIA AMALIA SAFITRI","kelas":"XI Soshum 2","tingkat":11,"jk":"P"},{"uid":"12437","nama":"ZIYAD ABDUL RASYID","kelas":"XI Soshum 2","tingkat":11,"jk":"L"}];
+
+    // Opsi Jawaban Realistis 7 KAIH
+    const CHOICES = {
+      bangunPagi: ['Sebelum 04.00', '04.00–04.30', '04.30–05.00', '05.00–05.30', '05.30–06.00', 'Setelah 06.00'],
+      olahragaDurasi: ['<20 mnt', '20–30 mnt', '>30 mnt'],
+      makanSehat: ['Selalu', 'Kadang', 'Tidak'],
+      gemarBelajarDurasi: ['0', '<30 mnt', '30–60 mnt', '>60 mnt'],
+      gemarBelajarCatatan: [
+        'Latihan soal Matematika dan persiapan ujian',
+        'Membaca materi Biologi Bab 3',
+        'Merangkum materi Sejarah Kebangsaan',
+        'Mengerjakan tugas Fisika materi Dinamika Gerak',
+        'Latihan soal UTBK / SNBT penalaran matematika',
+        'Membaca modul Kimia ikatan kimia',
+        'Belajar mandiri Bahasa Inggris grammar dan reading',
+        'Mengulang materi pelajaran tadi pagi'
+      ],
+      bermasyarakat: ['Ya', 'Tidak'],
+      tidurCepat: ['Sebelum 21.00', '21–22.00', '22–23.00', 'Setelah 23.00'],
+      tidurCatatan: [
+        'Alhamdulillah seluruh target kegiatan hari ini tercapai',
+        'Hari ini cukup padat, perlu istirahat lebih cukup',
+        'Besok bangun lebih awal untuk persiapan piket kelas',
+        'Evaluasi diri: perlu kurangi screen time sebelum tidur',
+        'Hari yang produktif dan menyenangkan'
+      ]
+    };
+
+    function getRandomItem(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function generateRandomAnswers(student) {
+      const bangunPagi = getRandomItem(CHOICES.bangunPagi);
+      const isFemale = (student.jk === 'P');
+      const isBerhalangan = isFemale && (Math.random() < 0.15);
+
+      let ibadahObj = {
+        berhalangan: isBerhalangan,
+        lengkap: false,
+        shubuh: false,
+        dzuhur: false,
+        ashar: false,
+        maghrib: false,
+        isya: false
+      };
+
+      if (!isBerhalangan) {
+        const isLengkap = Math.random() < 0.70;
+        if (isLengkap) {
+          ibadahObj.lengkap = true;
+          ibadahObj.shubuh = true;
+          ibadahObj.dzuhur = true;
+          ibadahObj.ashar = true;
+          ibadahObj.maghrib = true;
+          ibadahObj.isya = true;
+        } else {
+          ibadahObj.shubuh = Math.random() < 0.90;
+          ibadahObj.dzuhur = Math.random() < 0.95;
+          ibadahObj.ashar = Math.random() < 0.85;
+          ibadahObj.maghrib = Math.random() < 0.90;
+          ibadahObj.isya = Math.random() < 0.85;
+          ibadahObj.lengkap = (ibadahObj.shubuh && ibadahObj.dzuhur && ibadahObj.ashar && ibadahObj.maghrib && ibadahObj.isya);
+        }
+      }
+
+      const isOlahraga = Math.random() < 0.75;
+      const olahraga = isOlahraga ? 'Ya' : 'Tidak';
+      const olahragaDurasi = isOlahraga ? getRandomItem(CHOICES.olahragaDurasi) : '-';
+      const makanSehat = Math.random() < 0.65 ? 'Selalu' : (Math.random() < 0.75 ? 'Kadang' : 'Tidak');
+      const gemarBelajarDurasi = getRandomItem(CHOICES.gemarBelajarDurasi);
+      const gemarBelajarCatatan = (gemarBelajarDurasi !== '0' && Math.random() < 0.7) ? getRandomItem(CHOICES.gemarBelajarCatatan) : '';
+      const bermasyarakat = Math.random() < 0.80 ? 'Ya' : 'Tidak';
+      const tidurCepat = getRandomItem(CHOICES.tidurCepat);
+      const tidurCatatan = Math.random() < 0.6 ? getRandomItem(CHOICES.tidurCatatan) : '';
+
+      return {
+        bangunPagi,
+        ibadah: ibadahObj,
+        olahraga,
+        olahragaDurasi,
+        makanSehat,
+        gemarBelajarDurasi,
+        gemarBelajarCatatan,
+        bermasyarakat,
+        tidurCepat,
+        tidurCatatan
+      };
+    }
+
+    // STATE VARIABLES
+    let isRunning = false;
+    let shouldStop = false;
+    let isEnabled = true;
+
+    // DOM ELEMENTS
+    const mainToggle = document.getElementById('mainToggle');
+    const statusLabel = document.getElementById('statusLabel');
+    const statusBadge = document.getElementById('statusBadge');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const clearLogBtn = document.getElementById('clearLogBtn');
+    const sesiSelect = document.getElementById('sesiSelect');
+    const countSelect = document.getElementById('countSelect');
+    const delayRange = document.getElementById('delayRange');
+    const delayLabel = document.getElementById('delayLabel');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const speedText = document.getElementById('speedText');
+    const statSuccess = document.getElementById('statSuccess');
+    const statSkip = document.getElementById('statSkip');
+    const statFail = document.getElementById('statFail');
+    const consoleLog = document.getElementById('consoleLog');
+    const endpointInfo = document.getElementById('endpointInfo');
+
+    endpointInfo.textContent = CONFIG.SCRIPT_URL ? CONFIG.SCRIPT_URL.substring(0, 55) + '...' : 'Belum diisi';
+
+    // TOGGLE EVENT
+    mainToggle.addEventListener('change', () => {
+      isEnabled = mainToggle.checked;
+      if (isEnabled) {
+        statusLabel.textContent = 'STATUS: AKTIF';
+        statusLabel.style.color = 'var(--gray-900)';
+        statusBadge.textContent = 'Siap Mengirim';
+        statusBadge.style.background = 'var(--success-light)';
+        statusBadge.style.color = 'var(--success-dark)';
+        startBtn.disabled = isRunning;
+        addLog('[INFO] Fitur pengisian otomatis DIAKTIFKAN.', 'log-info');
+      } else {
+        statusLabel.textContent = 'STATUS: NONAKTIF';
+        statusLabel.style.color = 'var(--danger)';
+        statusBadge.textContent = 'Terkunci (Off)';
+        statusBadge.style.background = 'var(--danger-light)';
+        statusBadge.style.color = 'var(--danger)';
+        startBtn.disabled = true;
+        if (isRunning) {
+          shouldStop = true;
+          addLog('[PERINGATAN] Saklar dimatikan! Menghentikan pengisian otomatis yang sedang berjalan...', 'log-fail');
+        } else {
+          addLog('[INFO] Fitur pengisian otomatis DINONAKTIFKAN. Tombol Mulai terkunci.', 'log-fail');
+        }
+      }
+    });
+
+    delayRange.addEventListener('input', () => {
+      delayLabel.textContent = delayRange.value + ' ms';
+    });
+
+    clearLogBtn.addEventListener('click', () => {
+      consoleLog.innerHTML = '';
+    });
+
+    function addLog(text, className = '') {
+      const line = document.createElement('div');
+      line.className = 'log-line ' + className;
+      const time = new Date().toLocaleTimeString('id-ID');
+      line.textContent = '[' + time + '] ' + text;
+      consoleLog.appendChild(line);
+      consoleLog.scrollTop = consoleLog.scrollHeight;
+    }
+
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+    // START TEST RUNNER
+    startBtn.addEventListener('click', async () => {
+      if (!isEnabled) {
+        alert('Fitur pengisian otomatis sedang nonaktif. Silakan aktifkan saklar terlebih dahulu!');
+        return;
+      }
+      if (!CONFIG.SCRIPT_URL) {
+        alert('SCRIPT_URL belum dikonfigurasi di js/config.js');
+        return;
+      }
+
+      const targetSesi = sesiSelect.value;
+      const count = parseInt(countSelect.value, 10);
+      const delay = parseInt(delayRange.value, 10);
+      const targetList = ALL_STUDENTS.slice(0, count);
+
+      isRunning = true;
+      shouldStop = false;
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      sesiSelect.disabled = true;
+      countSelect.disabled = true;
+
+      statSuccess.textContent = '0';
+      statSkip.textContent = '0';
+      statFail.textContent = '0';
+      progressBar.style.width = '0%';
+      speedText.textContent = 'Status: Berjalan...';
+
+      addLog('====================================================', 'log-info');
+      addLog('MEMULAI PENGISIAN: Sesi ' + targetSesi + ' | ' + targetList.length + ' Siswa | Jeda ' + delay + 'ms', 'log-info');
+      addLog('====================================================', 'log-info');
+
+      let successCount = 0;
+      let skipCount = 0;
+      let failCount = 0;
+      const startTime = Date.now();
+
+      for (let i = 0; i < targetList.length; i++) {
+        if (shouldStop || !isEnabled) {
+          addLog('[BERHENTI] Proses pengujian dihentikan oleh pengguna.', 'log-fail');
+          break;
+        }
+
+        const student = targetList[i];
+        const seq = String(i + 1).padStart(3, '0');
+        const answers = generateRandomAnswers(student);
+
+        const payload = {
+          action: 'submit',
+          uid: student.uid,
+          sesi: targetSesi,
+          answers: answers
+        };
+
+        const studentInfo = '[' + seq + '/' + targetList.length + '] ' + student.uid + ' - ' + student.nama.substring(0, 22) + ' (' + student.kelas + ')';
+
+        try {
+          const res = await fetch(CONFIG.SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+
+          if (data.success) {
+            successCount++;
+            statSuccess.textContent = successCount;
+            addLog(studentInfo + ' -> BERHASIL (' + (data.submissionId || 'OK') + ')', 'log-ok');
+          } else {
+            if (data.message && data.message.includes('sudah pernah mengisi')) {
+              skipCount++;
+              statSkip.textContent = skipCount;
+              addLog(studentInfo + ' -> SKIP (Sudah isi Sesi ' + targetSesi + ')', 'log-skip');
+            } else {
+              failCount++;
+              statFail.textContent = failCount;
+              addLog(studentInfo + ' -> GAGAL (' + data.message + ')', 'log-fail');
+            }
+          }
+        } catch (err) {
+          failCount++;
+          statFail.textContent = failCount;
+          addLog(studentInfo + ' -> ERROR KONEKSI (' + err.message + ')', 'log-fail');
+        }
+
+        const percent = Math.round(((i + 1) / targetList.length) * 100);
+        progressBar.style.width = percent + '%';
+        progressText.textContent = 'Progress: ' + (i + 1) + ' / ' + targetList.length + ' Siswa (' + percent + '%)';
+
+        if (i < targetList.length - 1 && delay > 0) {
+          await sleep(delay);
+        }
+      }
+
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+      isRunning = false;
+      startBtn.disabled = !isEnabled;
+      stopBtn.disabled = true;
+      sesiSelect.disabled = false;
+      countSelect.disabled = false;
+      speedText.textContent = 'Status: Selesai (' + elapsed + ' detik)';
+
+      addLog('====================================================', 'log-info');
+      addLog('RINGKASAN: Selesai ' + targetList.length + ' siswa | ' + successCount + ' Berhasil | ' + skipCount + ' Skip | ' + failCount + ' Gagal (' + elapsed + 's)', 'log-info');
+      addLog('====================================================', 'log-info');
+    });
+
+    // STOP BUTTON
+    stopBtn.addEventListener('click', () => {
+      shouldStop = true;
+      addLog('[AKSI] Meminta penghentian simulasi...', 'log-fail');
+      stopBtn.disabled = true;
+    });
+  </script>
+</body>
+</html>

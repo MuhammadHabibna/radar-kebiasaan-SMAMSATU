@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pengisian Form 7 KAIH | VERTIKAL SMA 2026</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <!-- Header Bar -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="dashboard.html" class="brand-wrapper">
+        <div class="brand-badge">7K</div>
+        <div class="brand-text">
+          <h1>Monitoring 7 KAIH</h1>
+          <span id="activeSessionBadge">Sesi Aktif</span>
+        </div>
+      </a>
+      <div class="header-user">
+        <div class="user-pill" id="headerUserPill" style="display: none;">
+          <span id="headerUserName">Siswa</span>
+        </div>
+        <a href="dashboard.html" class="btn btn-outline btn-sm">Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+    <!-- Initial Loading State -->
+    <div id="initialLoader" class="card" style="text-align: center; padding: 3rem 1.5rem;">
+      <div class="spinner spinner-primary" style="width: 32px; height: 32px; margin-bottom: 0.85rem;"></div>
+      <h3 style="font-size: 1.05rem; font-weight: 600; color: var(--gray-800); margin-bottom: 0.25rem;">Memeriksa Sesi Pengisian</h3>
+      <p style="font-size: 0.85rem; color: var(--gray-500);">Mohon tunggu sebentar selagi sistem memverifikasi status Anda...</p>
+    </div>
+
+    <!-- Sesi Ditutup / Sudah Isi Alert Card -->
+    <div id="sessionNoticeCard" class="card" style="display: none; text-align: center; padding: 2.5rem 1.5rem;">
+      <h2 id="noticeTitle" style="font-size: 1.3rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.5rem;">
+        Form Belum Dibuka
+      </h2>
+      <p id="noticeMessage" style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: 1.5rem; max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.5;">
+        Tidak ada sesi pengisian yang aktif hari ini.
+      </p>
+      <a href="dashboard.html" class="btn btn-primary">Kembali ke Dashboard</a>
+    </div>
+
+    <!-- Form Wizard Card -->
+    <div id="formWizardCard" class="card" style="display: none;">
+      <!-- Wizard Progress Header -->
+      <div class="wizard-header">
+        <div class="wizard-progress-track">
+          <div id="progressBar" class="wizard-progress-bar" style="width: 14.28%;"></div>
+        </div>
+        <div class="wizard-step-info">
+          <span id="stepTitleText">Kebiasaan 1 dari 7</span>
+          <span id="stepCounterBadge" class="wizard-step-counter">1 / 7</span>
+        </div>
+      </div>
+
+      <!-- Alert Box -->
+      <div id="formAlert" class="alert alert-danger" style="display: none;"></div>
+
+      <!-- STEP 1: Bangun Pagi -->
+      <div class="step-pane active" data-step="1">
+        <span class="question-badge">Kebiasaan 1 &bull; Bangun Pagi</span>
+        <h2 class="question-title">Pukul berapa Anda bangun tidur hari ini?</h2>
+        <p class="question-desc">Pilih waktu bangun pagi yang sesuai dengan aktivitas hari ini.</p>
+
+        <div class="options-grid" id="q1Options">
+          <div class="option-tile" data-val="Sebelum 04.00">
+            <div class="text-wrap">
+              <span class="label">Sebelum 04.00</span>
+              <span class="subtext">Bangun sangat pagi (tahajud atau persiapan ibadah fajar)</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+          <div class="option-tile" data-val="04.00–04.30">
+            <div class="text-wrap">
+              <span class="label">04.00 – 04.30</span>
+              <span class="subtext">Awal waktu fajar / shalat subuh tepat waktu</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+          <div class="option-tile" data-val="04.30–05.00">
+            <div class="text-wrap">
+              <span class="label">04.30 – 05.00</span>
+              <span class="subtext">Waktu subuh dan persiapan pagi awal</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+          <div class="option-tile" data-val="05.00–05.30">
+            <div class="text-wrap">
+              <span class="label">05.00 – 05.30</span>
+              <span class="subtext">Pagi hari, persiapan berangkat sekolah</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+          <div class="option-tile" data-val="05.30–06.00">
+            <div class="text-wrap">
+              <span class="label">05.30 – 06.00</span>
+              <span class="subtext">Mendekati jam berangkat sekolah</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+          <div class="option-tile" data-val="Setelah 06.00">
+            <div class="text-wrap">
+              <span class="label">Setelah 06.00</span>
+              <span class="subtext">Bangun mepet atau berpotensi terlambat ke sekolah</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Beribadah -->
+      <div class="step-pane" data-step="2">
+        <span class="question-badge">Kebiasaan 2 &bull; Beribadah</span>
+        <h2 class="question-title">Ibadah shalat apa saja yang Anda laksanakan hari ini?</h2>
+        <p class="question-desc">Centang waktu ibadah yang telah dilaksanakan dengan tertib.</p>
+
+        <!-- Master Toggle Lengkap -->
+        <div class="prayer-master-card" id="prayerMasterToggle">
+          <div>
+            <strong class="prayer-master-label" style="font-size: 0.9rem; display: block; color: var(--gray-800);">Lengkap (5 Waktu)</strong>
+            <span style="font-size: 0.775rem; color: var(--gray-500);">Pilih opsi ini jika mendirikan seluruh shalat fardhu</span>
+          </div>
+          <span class="badge badge-success" id="masterBadge" style="display: none;">Lengkap</span>
+        </div>
+
+        <!-- Prayer Grid -->
+        <div class="prayer-grid" id="prayerGridContainer">
+          <div class="prayer-tile" data-prayer="shubuh">
+            <span class="prayer-name">Shubuh</span>
+          </div>
+          <div class="prayer-tile" data-prayer="dzuhur">
+            <span class="prayer-name">Dzuhur</span>
+          </div>
+          <div class="prayer-tile" data-prayer="ashar">
+            <span class="prayer-name">Ashar</span>
+          </div>
+          <div class="prayer-tile" data-prayer="maghrib">
+            <span class="prayer-name">Maghrib</span>
+          </div>
+          <div class="prayer-tile" data-prayer="isya">
+            <span class="prayer-name">Isya</span>
+          </div>
+        </div>
+
+        <!-- Opsi Berhalangan (Khusus Siswi / Perempuan - Dinamis Sesuai Jenis Kelamin) -->
+        <div class="prayer-berhalangan-card" id="prayerBerhalanganToggle" style="display: none;">
+          <div class="text-wrap">
+            <strong class="berhalangan-label" style="font-size: 0.9rem; display: block; color: var(--gray-800);">Sedang Berhalangan (Khusus Perempuan)</strong>
+            <span class="subtext" style="font-size: 0.775rem; color: var(--gray-500); display: block; margin-top: 0.15rem;">Pilih jika sedang berhalangan / haid sehingga tidak melaksanakan shalat</span>
+          </div>
+          <div class="radio-circle" id="berhalanganRadio"></div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Berolahraga -->
+      <div class="step-pane" data-step="3">
+        <span class="question-badge">Kebiasaan 3 &bull; Berolahraga</span>
+        <h2 class="question-title">Apakah Anda berolahraga atau melakukan aktivitas fisik hari ini?</h2>
+        <p class="question-desc">Menjaga kebugaran jasmani dan ketahanan stamina harian.</p>
+
+        <div class="options-grid" id="q3OlahragaToggle">
+          <div class="option-tile" data-val="Ya">
+            <div class="text-wrap">
+              <span class="label">Ya</span>
+              <span class="subtext">Melakukan aktivitas olahraga atau latihan fisik</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+          <div class="option-tile" data-val="Tidak">
+            <div class="text-wrap">
+              <span class="label">Tidak</span>
+              <span class="subtext">Tidak berolahraga hari ini</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+        </div>
+
+        <!-- Sub Pertanyaan Durasi Olahraga (Kondisional) -->
+        <div class="sub-question-panel" id="q3SubPanel">
+          <label class="form-label">Durasi olahraga yang dilakukan:</label>
+          <div class="options-grid-horizontal" id="q3DurasiOptions">
+            <div class="option-tile" data-durasi="<20 mnt" style="padding: 0.75rem;">
+              <div class="text-wrap" style="text-align: center;">
+                <span class="label" style="font-size: 0.85rem;">&lt; 20 menit</span>
+              </div>
+            </div>
+            <div class="option-tile" data-durasi="20–30 mnt" style="padding: 0.75rem;">
+              <div class="text-wrap" style="text-align: center;">
+                <span class="label" style="font-size: 0.85rem;">20 – 30 menit</span>
+              </div>
+            </div>
+            <div class="option-tile" data-durasi=">30 mnt" style="padding: 0.75rem;">
+              <div class="text-wrap" style="text-align: center;">
+                <span class="label" style="font-size: 0.85rem;">&gt; 30 menit</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: Makan Sehat Bergizi -->
+      <div class="step-pane" data-step="4">
+        <span class="question-badge">Kebiasaan 4 &bull; Makan Sehat Bergizi</span>
+        <h2 class="question-title">Bagaimana pola makan sehat dan bergizi Anda hari ini?</h2>
+        <p class="question-desc">Memperhatikan menu bergizi seimbang, asupan sayur, buah, dan air minum cukup.</p>
+
+        <div class="options-grid" id="q4Options">
+          <div class="option-tile" data-val="Selalu">
+            <div class="text-wrap">
+              <span class="label">Selalu</span>
+              <span class="subtext">Makanan bergizi teratur, menu seimbang, minum air cukup</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+          <div class="option-tile" data-val="Kadang">
+            <div class="text-wrap">
+              <span class="label">Kadang</span>
+              <span class="subtext">Sebagian bergizi namun belum konsisten</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+          <div class="option-tile" data-val="Tidak">
+            <div class="text-wrap">
+              <span class="label">Tidak</span>
+              <span class="subtext">Pola makan tidak teratur / kurang memperhatikan asupan gizi</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: Gemar Belajar -->
+      <div class="step-pane" data-step="5">
+        <span class="question-badge">Kebiasaan 5 &bull; Gemar Belajar</span>
+        <h2 class="question-title">Berapa lama Anda belajar mandiri di luar jam pelajaran sekolah?</h2>
+        <p class="question-desc">Membaca buku, mengulang materi, mengerjakan tugas, atau eksplorasi ilmu baru.</p>
+
+        <div class="options-grid" id="q5Options">
+          <div class="option-tile" data-val="0">
+            <div class="text-wrap">
+              <span class="label">0 menit</span>
+              <span class="subtext">Belum belajar mandiri hari ini</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+          <div class="option-tile" data-val="<30 mnt">
+            <div class="text-wrap">
+              <span class="label">&lt; 30 menit</span>
+              <span class="subtext">Membaca kilas atau mereview ringkasan materi</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+          <div class="option-tile" data-val="30–60 mnt">
+            <div class="text-wrap">
+              <span class="label">30 – 60 menit</span>
+              <span class="subtext">Mendalami konsep atau menyelesaikan tugas</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+          <div class="option-tile" data-val=">60 mnt">
+            <div class="text-wrap">
+              <span class="label">&gt; 60 menit</span>
+              <span class="subtext">Belajar mendalam secara intensif</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 1rem;">
+          <label class="form-label" for="q5Notes">Catatan Materi Pelajaran (Opsional):</label>
+          <textarea id="q5Notes" class="form-control" placeholder="Tuliskan topik atau buku yang dipelajari hari ini..."></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 6: Bermasyarakat -->
+      <div class="step-pane" data-step="6">
+        <span class="question-badge">Kebiasaan 6 &bull; Bermasyarakat</span>
+        <h2 class="question-title">Apakah Anda aktif berinteraksi atau membantu lingkungan sekitar hari ini?</h2>
+        <p class="question-desc">Membantu keluarga/tetangga, kegiatan sosial, gotong royong, atau berorganisasi.</p>
+
+        <div class="options-grid" id="q6Options">
+          <div class="option-tile" data-val="Ya">
+            <div class="text-wrap">
+              <span class="label">Ya</span>
+              <span class="subtext">Terlibat dalam interaksi positif atau membantu sesama di lingkungan</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+          <div class="option-tile" data-val="Tidak">
+            <div class="text-wrap">
+              <span class="label">Tidak</span>
+              <span class="subtext">Belum berinteraksi dengan lingkungan sekitar hari ini</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 7: Tidur Cepat -->
+      <div class="step-pane" data-step="7">
+        <span class="question-badge">Kebiasaan 7 &bull; Tidur Cepat</span>
+        <h2 class="question-title">Rencana jam berapa Anda tidur malam ini?</h2>
+        <p class="question-desc">Menjaga waktu istirahat yang cukup untuk mendukung daya konsentrasi esok hari.</p>
+
+        <div class="options-grid" id="q7Options">
+          <div class="option-tile" data-val="Sebelum 21.00">
+            <div class="text-wrap">
+              <span class="label">Sebelum 21.00</span>
+              <span class="subtext">Tidur lebih awal, istirahat optimal</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+          <div class="option-tile" data-val="21–22.00">
+            <div class="text-wrap">
+              <span class="label">21.00 – 22.00</span>
+              <span class="subtext">Waktu istirahat malam yang teratur</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+          <div class="option-tile" data-val="22–23.00">
+            <div class="text-wrap">
+              <span class="label">22.00 – 23.00</span>
+              <span class="subtext">Menjelang larut malam</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+          <div class="option-tile" data-val="Setelah 23.00">
+            <div class="text-wrap">
+              <span class="label">Setelah 23.00</span>
+              <span class="subtext">Larut malam</span>
+            </div>
+            <div class="radio-circle"></div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 1rem;">
+          <label class="form-label" for="q7Notes">Catatan / Refleksi Hari Ini (Opsional):</label>
+          <textarea id="q7Notes" class="form-control" placeholder="Tuliskan catatan atau evaluasi pribadi hari ini..."></textarea>
+        </div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="wizard-footer">
+        <button type="button" id="prevBtn" class="btn btn-outline" style="visibility: hidden;">
+          Kembali
+        </button>
+        <button type="button" id="nextBtn" class="btn btn-primary" disabled>
+          Lanjut
+        </button>
+        <button type="button" id="submitBtn" class="btn btn-success" style="display: none;" disabled>
+          <span id="submitBtnText">Kirim Jawaban</span>
+          <span id="submitSpinner" class="spinner" style="display: none;"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Done / Success Screen dengan Animasi Checklist -->
+    <div id="doneScreenCard" class="card" style="display: none; text-align: center; padding: 3rem 1.5rem;">
+      <div class="checkmark-container">
+        <svg class="checkmark-svg" viewBox="0 0 52 52">
+          <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+          <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+      </div>
+
+      <h2 style="font-size: 1.45rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.4rem; letter-spacing: -0.015em;">
+        Jawaban Berhasil Disimpan
+      </h2>
+      <p style="font-size: 0.9rem; color: var(--gray-500); margin-bottom: 2rem; max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.5;">
+        Terima kasih telah mengisi pemantauan pembiasaan 7 KAIH hari ini. Data Anda telah tercatat dengan baik.
+      </p>
+      
+      <div style="display: flex; justify-content: center;">
+        <a href="dashboard.html" class="btn btn-primary">Kembali ke Dashboard</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    Web Form Monitoring 7 KAIH &bull; VERTIKAL SMA 2026 &bull; Kemendikdasmen RI
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/form.js"></script>
+</body>
+</html>

@@ -1,0 +1,619 @@
+/* ===================================================================
+   WEB FORM MONITORING 7 KAIH
+   Specific UI Components: Wizard, Option Tiles, Modals, Tables
+   Professional Minimalist Design System
+   =================================================================== */
+
+/* --- Step Wizard & Progress Bar --- */
+.wizard-header {
+  margin-bottom: 2rem;
+}
+
+.wizard-progress-track {
+  height: 6px;
+  background: var(--gray-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 0.85rem;
+  position: relative;
+}
+
+.wizard-progress-bar {
+  height: 100%;
+  background: var(--primary);
+  border-radius: var(--radius-full);
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 14.28%;
+}
+
+.wizard-step-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--gray-500);
+}
+
+.wizard-step-counter {
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-full);
+  font-size: 0.775rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* --- Question Card & Title --- */
+.step-pane {
+  display: none;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+.step-pane.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.question-badge {
+  display: inline-block;
+  color: var(--primary);
+  font-size: 0.775rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.question-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  line-height: 1.35;
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.015em;
+}
+
+.question-desc {
+  font-size: 0.9rem;
+  color: var(--gray-500);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+/* --- Interactive Option Tiles (Single Select) --- */
+.options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 1.5rem;
+}
+
+.options-grid-horizontal {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.65rem;
+}
+
+.option-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.95rem 1.15rem;
+  background: var(--white);
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition);
+  user-select: none;
+}
+
+.option-tile:hover {
+  border-color: var(--gray-300);
+  background: var(--gray-50);
+}
+
+.option-tile.selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.option-tile .text-wrap {
+  flex: 1;
+}
+
+.option-tile .label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  display: block;
+}
+
+.option-tile.selected .label {
+  color: var(--primary);
+}
+
+.option-tile .subtext {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+  display: block;
+  margin-top: 0.15rem;
+}
+
+.option-tile .radio-circle {
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--gray-300);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: var(--transition);
+  margin-left: 0.75rem;
+}
+
+.option-tile.selected .radio-circle {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.option-tile.selected .radio-circle::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--white);
+}
+
+/* --- Multi-Select Grid for Prayers (Beribadah) --- */
+.prayer-master-card {
+  background: var(--gray-50);
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.prayer-master-card:hover {
+  border-color: var(--gray-300);
+}
+
+.prayer-master-card.selected {
+  background: var(--success-light);
+  border-color: var(--success);
+}
+
+.prayer-master-card.selected .prayer-master-label {
+  color: var(--success-dark);
+}
+
+.prayer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 1.25rem;
+}
+
+.prayer-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.85rem 0.5rem;
+  background: var(--white);
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition);
+  min-height: 52px;
+}
+
+.prayer-tile:hover {
+  border-color: var(--gray-300);
+}
+
+.prayer-tile.selected {
+  border-color: var(--success);
+  background: var(--success-light);
+}
+
+.prayer-tile .prayer-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.prayer-tile.selected .prayer-name {
+  color: var(--success-dark);
+}
+
+/* Opsi Berhalangan (Perempuan) */
+.prayer-berhalangan-card {
+  background: var(--gray-50);
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.prayer-berhalangan-card:hover {
+  border-color: var(--gray-300);
+}
+
+.prayer-berhalangan-card.selected {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.prayer-berhalangan-card.selected .berhalangan-label {
+  color: var(--primary);
+}
+
+.prayer-berhalangan-card.selected .radio-circle {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.prayer-berhalangan-card.selected .radio-circle::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--white);
+}
+
+/* --- Conditional Sub-Question Panel --- */
+.sub-question-panel {
+  display: none;
+  background: var(--gray-50);
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--gray-200);
+  padding: 1.15rem;
+  margin-top: 0.75rem;
+  animation: slideDown 0.2s ease-out;
+}
+
+.sub-question-panel.open {
+  display: block;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Wizard Navigation Controls --- */
+.wizard-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--gray-200);
+}
+
+/* --- Animated Checklist (Post-Submission) --- */
+.checkmark-container {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkmark-svg {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: block;
+  stroke-width: 2.5;
+  stroke: var(--success);
+  stroke-miterlimit: 10;
+  box-shadow: inset 0px 0px 0px #10b981;
+  animation: checkFill 0.4s ease-in-out 0.4s forwards, checkScale 0.3s ease-in-out 0.9s both;
+}
+
+.checkmark-circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2.5;
+  stroke-miterlimit: 10;
+  stroke: var(--success);
+  fill: none;
+  animation: checkStroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  stroke: var(--success);
+  animation: checkStroke 0.35s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+}
+
+@keyframes checkStroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes checkScale {
+  0%, 100% {
+    transform: none;
+  }
+  50% {
+    transform: scale3d(1.08, 1.08, 1);
+  }
+}
+
+@keyframes checkFill {
+  100% {
+    box-shadow: inset 0px 0px 0px 40px rgba(16, 185, 129, 0.12);
+  }
+}
+
+/* --- Dashboard 4 Sessions Cards (Peserta) --- */
+.sessions-timeline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.session-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--gray-200);
+  padding: 1.25rem;
+  position: relative;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.session-card.status-selesai {
+  border-color: var(--success);
+  background: #fafdfb;
+}
+
+.session-card.status-aktif {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+}
+
+.session-card.status-terkunci {
+  background: var(--gray-50);
+  opacity: 0.75;
+}
+
+.session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.session-number {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.session-date {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+  margin-bottom: 0.75rem;
+}
+
+/* --- Admin Dashboard Specifics --- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--gray-900);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.stat-sub {
+  font-size: 0.775rem;
+  color: var(--gray-500);
+  margin-top: 0.35rem;
+}
+
+/* Filter Bar */
+.filter-bar {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: flex-end;
+}
+
+.filter-group {
+  flex: 1;
+  min-width: 140px;
+}
+
+/* Data Table */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.data-table th {
+  background: var(--gray-50);
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: var(--gray-600);
+  border-bottom: 1px solid var(--gray-200);
+  white-space: nowrap;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.data-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--gray-200);
+  color: var(--gray-800);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* Recap list in modal / dashboard */
+.recap-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.recap-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.75rem 0.95rem;
+  background: var(--gray-50);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--gray-200);
+  gap: 1rem;
+}
+
+.recap-title {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--gray-600);
+}
+
+.recap-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  text-align: right;
+}
+
+/* Modal Popup */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  max-width: 540px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-xl);
+  padding: 1.5rem;
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.modal-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.modal-close {
+  background: var(--gray-100);
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.15rem;
+  color: var(--gray-600);
+  transition: var(--transition);
+}
+
+.modal-close:hover {
+  background: var(--gray-200);
+  color: var(--gray-900);
+}

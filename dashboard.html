@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Peserta | Monitoring 7 KAIH</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <!-- Header Bar -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-wrapper">
+        <div class="brand-badge">7K</div>
+        <div class="brand-text">
+          <h1>Dashboard Peserta</h1>
+          <span>7 Kebiasaan Anak Indonesia Hebat</span>
+        </div>
+      </div>
+      <div class="header-user">
+        <div class="user-pill" id="headerUserPill" style="display: none;">
+          <span id="headerUserName">Siswa</span>
+        </div>
+        <button id="logoutBtn" class="btn btn-outline btn-sm">Keluar</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+    <!-- User Profile Header Card -->
+    <div class="card">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+        <div>
+          <span class="badge badge-primary" style="margin-bottom: 0.4rem;">Profil Siswa</span>
+          <h2 id="profileNama" style="font-size: 1.35rem; font-weight: 700; color: var(--gray-900); line-height: 1.25;">
+            Memuat profil...
+          </h2>
+          <div style="font-size: 0.85rem; color: var(--gray-600); margin-top: 0.25rem;">
+            NISN / UID: <strong id="profileUid" style="color: var(--primary);">-</strong> &nbsp;&bull;&nbsp; 
+            Kelas: <strong id="profileKelas">-</strong> &nbsp;&bull;&nbsp; 
+            Tingkat: <strong id="profileTingkat">-</strong> &nbsp;&bull;&nbsp;
+            Kelamin: <strong id="profileJk">-</strong>
+          </div>
+        </div>
+
+        <div id="activeSessionCta" style="display: none;">
+          <a href="form.html" class="btn btn-primary btn-sm">
+            Isi Form Sesi Aktif
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sesi Timeline Section -->
+    <div style="margin-bottom: 1rem;">
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.2rem;">
+        Jadwal & Riwayat Pengisian
+      </h3>
+      <p style="font-size: 0.85rem; color: var(--gray-500);">
+        Rekapitulasi partisipasi pengisian pembiasaan 7 KAIH pada setiap sesi.
+      </p>
+    </div>
+
+    <!-- Timeline Grid Loader -->
+    <div id="sessionsLoader" style="text-align: center; padding: 2.5rem 1rem;">
+      <div class="spinner spinner-primary" style="width: 30px; height: 30px; margin-bottom: 0.5rem;"></div>
+      <p style="color: var(--gray-500); font-size: 0.85rem;">Memuat data sesi...</p>
+    </div>
+
+    <!-- Sessions Timeline Container -->
+    <div id="sessionsContainer" class="sessions-timeline" style="display: none;">
+      <!-- Diisi secara dinamis oleh JavaScript -->
+    </div>
+
+    <!-- Ringkasan Jawaban Expandable Container -->
+    <div id="historyDetailSection" style="margin-top: 1.75rem; display: none;">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.65rem;">
+        Rincian Jawaban Sesi
+      </h3>
+      <div class="card" id="historyCard">
+        <!-- Render detail jawaban sesi yang dipilih -->
+      </div>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    Web Form Monitoring 7 KAIH &bull; VERTIKAL SMA 2026 &bull; Kemendikdasmen RI
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

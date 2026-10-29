@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masuk | Monitoring 7 KAIH — VERTIKAL SMA 2026</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <!-- Header Bar -->
+  <header class="app-header">
+    <div class="header-container" style="justify-content: center;">
+      <div class="brand-wrapper">
+        <div class="brand-badge">7K</div>
+        <div class="brand-text">
+          <h1>7 Kebiasaan Anak Indonesia Hebat</h1>
+          <span>VERTIKAL SMA 2026 &bull; Kemendikdasmen</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Login Container -->
+  <main class="container" style="display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 140px);">
+    <div class="card" style="width: 100%; max-width: 420px; margin: 0 auto;">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <span class="badge badge-primary" style="margin-bottom: 0.75rem;">Portal Masuk</span>
+        <h2 style="font-size: 1.45rem; font-weight: 700; color: var(--gray-900); letter-spacing: -0.02em;">Masuk ke Akun</h2>
+        <p style="font-size: 0.875rem; color: var(--gray-500); margin-top: 0.35rem; line-height: 1.45;">
+          Gunakan UID / NISN dan kata sandi yang telah disiapkan oleh pihak sekolah.
+        </p>
+      </div>
+
+      <div id="loginAlert" class="alert alert-danger" style="display: none;"></div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="uidInput">UID / NISN / Username</label>
+          <input 
+            type="text" 
+            id="uidInput" 
+            class="form-control" 
+            placeholder="Masukkan UID atau NISN" 
+            required 
+            autocomplete="username"
+            autofocus
+          >
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+            <label class="form-label" for="passwordInput" style="margin-bottom: 0;">Kata Sandi</label>
+            <button type="button" id="togglePassBtn" style="background: none; border: none; font-size: 0.8rem; color: var(--primary); cursor: pointer; font-weight: 600;">
+              Lihat
+            </button>
+          </div>
+          <input 
+            type="password" 
+            id="passwordInput" 
+            class="form-control" 
+            placeholder="Masukkan kata sandi" 
+            required 
+            autocomplete="current-password"
+          >
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn btn-primary btn-block" style="margin-top: 1.75rem;">
+          <span id="btnText">Masuk</span>
+          <span id="btnSpinner" class="spinner" style="display: none;"></span>
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    Web Form Monitoring 7 KAIH &bull; VERTIKAL SMA 2026 &bull; Kemendikdasmen RI
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    Auth.redirectIfLoggedIn();
+
+    const form = document.getElementById('loginForm');
+    const uidInput = document.getElementById('uidInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const togglePassBtn = document.getElementById('togglePassBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const loginAlert = document.getElementById('loginAlert');
+
+    togglePassBtn.addEventListener('click', () => {
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        togglePassBtn.textContent = 'Sembunyikan';
+      } else {
+        passwordInput.type = 'password';
+        togglePassBtn.textContent = 'Lihat';
+      }
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginAlert.style.display = 'none';
+      loginAlert.textContent = '';
+
+      const uid = uidInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if (!uid || !password) {
+        loginAlert.textContent = 'Silakan isi UID dan kata sandi.';
+        loginAlert.style.display = 'block';
+        return;
+      }
+
+      submitBtn.disabled = true;
+      btnText.textContent = 'Memverifikasi...';
+      btnSpinner.style.display = 'inline-block';
+
+      try {
+        const response = await Api.login(uid, password);
+
+        if (response.success && response.user) {
+          Auth.saveUser(response.user);
+
+          if (response.user.role === 'admin') {
+            window.location.href = 'admin.html';
+          } else {
+            try {
+              const sesiRes = await Api.cekSesi();
+              if (sesiRes.success && sesiRes.sesiAktif) {
+                const sudahRes = await Api.cekSudahIsi(response.user.uid, sesiRes.sesiAktif.sesi);
+                if (sudahRes.success && sudahRes.sudahIsi) {
+                  window.location.href = 'dashboard.html';
+                } else {
+                  window.location.href = 'form.html';
+                }
+              } else {
+                window.location.href = 'dashboard.html';
+              }
+            } catch (err) {
+              window.location.href = 'dashboard.html';
+            }
+          }
+        } else {
+          loginAlert.textContent = response.message || 'UID atau kata sandi tidak sesuai.';
+          loginAlert.style.display = 'block';
+          submitBtn.disabled = false;
+          btnText.textContent = 'Masuk';
+          btnSpinner.style.display = 'none';
+        }
+      } catch (err) {
+        loginAlert.textContent = 'Terjadi kendala jaringan saat menghubungi server.';
+        loginAlert.style.display = 'block';
+        submitBtn.disabled = false;
+        btnText.textContent = 'Masuk';
+        btnSpinner.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

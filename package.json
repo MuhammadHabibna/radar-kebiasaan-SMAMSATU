@@ -1,0 +1,22 @@
+{
+  "name": "web-form-monitoring-7-kaih",
+  "version": "1.0.0",
+  "description": "Aplikasi Web Form Monitoring 7 Kebiasaan Anak Indonesia Hebat (7 KAIH) - VERTIKAL SMA 2026 Kemendikdasmen RI",
+  "main": "index.html",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "test": "node auto_test.js --help",
+    "test:quick": "node auto_test.js --aktif --count 10 --sesi 1",
+    "test:all": "node auto_test.js --aktif --sesi 1",
+    "start": "node -e \"const http = require('http'); const fs = require('fs'); const path = require('path'); const server = http.createServer((req, res) => { let p = req.url === '/' ? 'index.html' : req.url.slice(1); if (!fs.existsSync(p)) { res.writeHead(404); return res.end('Not Found'); } const ext = path.extname(p); const mime = { '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript', '.tsv': 'text/tab-separated-values', '.json': 'application/json' }; res.writeHead(200, { 'Content-Type': mime[ext] || 'text/plain' }); fs.createReadStream(p).pipe(res); }); server.listen(3000, () => console.log('Local Server aktif di http://localhost:3000'));\""
+  },
+  "keywords": [
+    "7-kaih",
+    "kemendikdasmen",
+    "sma",
+    "google-sheets",
+    "google-apps-script"
+  ],
+  "author": "Kemendikdasmen RI / Tim Pengembang 7 KAIH",
+  "license": "MIT"
+}
